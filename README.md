@@ -11,23 +11,19 @@ _Block_ bad data before storage. _Prove_ what happened. _Rollback_ when things b
 
 ## Installation
 
-**Python:**
+**Python:** ```pip install anchorai```
 
-```pip install anchorai```
-
-**TypeScript/JavaScript:**
-
-```npm install anchorai```
+**TypeScript/JavaScript:** ```npm install anchorai```
 
 ## Quick Start
 
 ### 1. Get an API Key
 
-Sign up at [app.getanchor.dev](https://app.getanchor.dev) to get your API key and workspace ID.
+Sign up at [app.getanchor.dev](https://getanchor.dev) to get your API key and workspace ID.
 
 ### 2. Start Using Anchor
 
-**Python** ([PyPI](https://pypi.org/project/anchorai/1.0.0/), [code](https://github.com/anchorco/anchor-sdk/python-sdk)):
+**Python** ([PyPI](https://pypi.org/project/anchorai), [code](https://github.com/anchorco/anchor-sdk/python-sdk)):
 ```python
 from anchor import Anchor
 
@@ -59,7 +55,7 @@ await anchor.config.update(agent.id, { policies: { block_pii: true } });
 
 [**Python Reference**](https://github.com/anchorco/anchor-sdk/tree/main/python-sdk)
   
-[**TypeScript Reference**](https://github.com/anchorco/anchor-sdk/main/typescript-sdk)
+[**TypeScript Reference**](https://github.com/anchorco/anchor-sdk/tree/main/typescript-sdk)
   
 **Contributing**: Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
