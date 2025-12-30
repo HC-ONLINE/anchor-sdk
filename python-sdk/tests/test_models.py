@@ -2,7 +2,6 @@
 
 import pytest
 from datetime import datetime
-from typing import Dict, Any
 
 from anchor.models import (
     Agent,

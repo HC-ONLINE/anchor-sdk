@@ -1,7 +1,7 @@
 """Pytest configuration and fixtures for Anchor SDK tests"""
 
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 from anchor import Anchor
 
 

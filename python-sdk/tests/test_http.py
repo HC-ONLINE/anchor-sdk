@@ -1,15 +1,12 @@
 """Tests for HTTP client utilities."""
 
 import pytest
-import time
-from unittest.mock import Mock, patch, MagicMock
-import requests
-from requests.exceptions import Timeout, ConnectionError, RequestException
+from unittest.mock import Mock, patch
+from requests.exceptions import Timeout, ConnectionError
 
 from anchor.config import Config
 from anchor._http import HttpClient
 from anchor.exceptions import (
-    AnchorAPIError,
     AuthenticationError,
     AuthorizationError,
     NotFoundError,

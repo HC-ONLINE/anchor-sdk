@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "anchorai"
-version = "1.0.0"
+version = "1.0.1"
 description = "Control what your AI agents store. Audit everything."
 readme = "README.md"
 license = "Apache-2.0"
@@ -39,7 +39,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 requires-python = ">=3.8"
-dependencies = ["requests>=2.28.0"]
+dependencies = ["requests>=2.28.0", "pydantic>=2.0.0"]
 
 [project.optional-dependencies]
 # Framework integrations

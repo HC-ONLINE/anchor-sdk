@@ -1,7 +1,7 @@
 """Tests for framework integrations."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from datetime import datetime, timezone
 
 from anchor import Anchor
@@ -131,7 +131,6 @@ class TestLangChainIntegration:
     ):
         """Test loading memory variables."""
         from anchor.integrations.langchain import AnchorMemory
-        from anchor.models import DataEntry
 
         # Mock list and read_full
         anchor.data.list.return_value = ["chat:test:human:1", "chat:test:ai:2"]

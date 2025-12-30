@@ -1,14 +1,13 @@
 """Tests for Anchor SDK with 5 namespaces (agents, config, data, checkpoints, audit)"""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime
+from unittest.mock import patch
 
-from anchor import Anchor, Agent, Config, ConfigVersion
-from anchor import WriteResult, DataEntry, SearchResult
+from anchor import Anchor, Agent, Config
+from anchor import WriteResult
 from anchor import Checkpoint, RestoreResult
 from anchor import AuditEvent, Verification, ExportResult
-from anchor.exceptions import NotFoundError, ValidationError
+from anchor.exceptions import NotFoundError
 
 
 class TestAnchorClient:
