@@ -35,7 +35,7 @@ class DefaultPolicyPack:
         """
         Returns dict with configured policies to be used in `config`
         """
-        policies = {}
+        policies: dict[str, Any] = {}
 
         if self.allowed_domains is not None:
             policies["allowed_domains"] = self.allowed_domains
