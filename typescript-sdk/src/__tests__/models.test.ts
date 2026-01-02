@@ -19,6 +19,7 @@ import type {
   Verification,
   ExportResult,
 } from '../namespaces';
+import { defaultPolicyPack } from '../policies';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -814,5 +815,50 @@ describe('Model Edge Cases', () => {
     expect(checkpoints).toHaveLength(2);
     expect(checkpoints[0].id).toBe('cp_1');
     expect(checkpoints[1].dataSnapshot.keyCount).toBe(50);
+  });
+});
+
+describe('defaultPolicyPack', () => {
+  it('should have correct defaults', () => {
+    const config = defaultPolicyPack();
+    const policies = config.policies;
+
+    expect(policies.max_query_size).toBe(1000);
+    expect(policies.allowed_domains).toBeUndefined();
+    expect(policies.require_approval_for).toEqual(['delete', 'update', 'export']);
+    expect(policies.block_pii).toBe(true);
+    expect(policies.block_secrets).toBe(true);
+  });
+
+  it('should allow custom values', () => {
+    const config = defaultPolicyPack({
+      allowedDomains: ['example.com'],
+      maxQuerySize: 500,
+      requireApprovalFor: ['delete'],
+      blockPii: false,
+      blockSecrets: false,
+    });
+    const policies = config.policies;
+
+    expect(policies.allowed_domains).toEqual(['example.com']);
+    expect(policies.max_query_size).toBe(500);
+    expect(policies.require_approval_for).toEqual(['delete']);
+    expect(policies.block_pii).toBe(false);
+    expect(policies.block_secrets).toBe(false);
+  });
+
+  it('should allow disabling optional policies', () => {
+    const config = defaultPolicyPack({
+      allowedDomains: null,
+      maxQuerySize: null,
+      requireApprovalFor: null,
+    });
+    const policies = config.policies;
+
+    expect(policies.allowed_domains).toBeUndefined();
+    expect(policies.max_query_size).toBeUndefined();
+    expect(policies.require_approval_for).toBeUndefined();
+    expect(policies.block_pii).toBe(true);
+    expect(policies.block_secrets).toBe(true);
   });
 });
