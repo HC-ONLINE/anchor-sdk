@@ -569,6 +569,10 @@ class TestMCPIntegration:
         """Create a mock Anchor client."""
         anchor = Mock(spec=Anchor)
         anchor.agents = Mock()
+        # Mock successful agent validation
+        mock_agent = Mock()
+        mock_agent.id = "agent_123"
+        anchor.agents.get.return_value = mock_agent
         return anchor
 
     @pytest.fixture
@@ -577,7 +581,7 @@ class TestMCPIntegration:
         return "agent_123"
 
     def test_anchor_mcp_server_initialization(self, anchor, agent_id):
-        """Test AnchorMCPServer initialization."""
+        """Test AnchorMCPServer initialization with validation."""
         from anchor.integrations.mcp import AnchorMCPServer
 
         class DummyServer:
@@ -595,6 +599,67 @@ class TestMCPIntegration:
         assert wrapper.anchor == anchor
         assert wrapper.agent_id == agent_id
         assert wrapper.base_server == base_server
+        # Should have validated agent exists
+        anchor.agents.get.assert_called_once_with(agent_id)
+
+    def test_anchor_mcp_server_skip_validation(self, anchor, agent_id):
+        """Test AnchorMCPServer initialization without validation."""
+        from anchor.integrations.mcp import AnchorMCPServer
+
+        class DummyServer:
+            """Mock MCP server for testing."""
+            def start(self):
+                return "started"
+
+        wrapper = AnchorMCPServer(
+            anchor=anchor,
+            agent_id=agent_id,
+            base_server=DummyServer(),
+            validate=False
+        )
+
+        assert wrapper.agent_id == agent_id
+        # Should not have called validation
+        anchor.agents.get.reset_mock()
+        anchor.agents.get.assert_not_called()
+
+    def test_anchor_mcp_server_validation_missing_agents_api(self, agent_id):
+        """Test validation fails when anchor doesn't have agents API."""
+        from anchor.integrations.mcp import AnchorMCPServer
+
+        invalid_anchor = Mock(spec=[])
+
+        class DummyServer:
+            """Mock MCP server for testing."""
+            def start(self):
+                return "started"
+
+        with pytest.raises(ValueError, match="does not expose agents API"):
+            AnchorMCPServer(
+                anchor=invalid_anchor,
+                agent_id=agent_id,
+                base_server=DummyServer()
+            )
+
+    def test_anchor_mcp_server_validation_invalid_agent_id(self, anchor):
+        """Test validation fails when agent_id doesn't exist."""
+        from anchor.integrations.mcp import AnchorMCPServer
+        from anchor.exceptions import AnchorError
+
+        # Mock agent.get to raise error
+        anchor.agents.get.side_effect = AnchorError("Agent not found")
+
+        class DummyServer:
+            """Mock MCP server for testing."""
+            def start(self):
+                return "started"
+
+        with pytest.raises(ValueError, match="Failed to validate agent_id"):
+            AnchorMCPServer(
+                anchor=anchor,
+                agent_id="invalid_agent",
+                base_server=DummyServer()
+            )
 
     def test_anchor_mcp_server_wraps_base_server(self, anchor, agent_id):
         """Test that AnchorMCPServer delegates to base server."""
