@@ -560,3 +560,63 @@ class TestMem0Integration:
 
         with pytest.raises(ImportError, match="Mem0 is required"):
             AnchorMem0(anchor=anchor, agent_id=agent_id, mem0_client=Mock())
+
+class TestMCPIntegration:
+    """Tests for MCP (Model Context Protocol) integration."""
+
+    @pytest.fixture
+    def anchor(self):
+        """Create a mock Anchor client."""
+        anchor = Mock(spec=Anchor)
+        anchor.agents = Mock()
+        return anchor
+
+    @pytest.fixture
+    def agent_id(self):
+        """Return a test agent ID."""
+        return "agent_123"
+
+    def test_anchor_mcp_server_initialization(self, anchor, agent_id):
+        """Test AnchorMCPServer initialization."""
+        from anchor.integrations.mcp import AnchorMCPServer
+
+        class DummyServer:
+            """Mock MCP server for testing."""
+            def start(self):
+                return "started"
+
+        base_server = DummyServer()
+        wrapper = AnchorMCPServer(
+            anchor=anchor,
+            agent_id=agent_id,
+            base_server=base_server
+        )
+
+        assert wrapper.anchor == anchor
+        assert wrapper.agent_id == agent_id
+        assert wrapper.base_server == base_server
+
+    def test_anchor_mcp_server_wraps_base_server(self, anchor, agent_id):
+        """Test that AnchorMCPServer delegates to base server."""
+        from anchor.integrations.mcp import AnchorMCPServer
+
+        class DummyServer:
+            """Mock MCP server for testing."""
+            def start(self):
+                return "started"
+
+        wrapper = AnchorMCPServer(
+            anchor=anchor,
+            agent_id=agent_id,
+            base_server=DummyServer()
+        )
+
+        assert wrapper.start() == "started"
+
+    def test_mcp_module_exports(self):
+        """Test that MCP module exports AnchorMCPServer."""
+        from anchor.integrations.mcp import AnchorMCPServer
+        from anchor.integrations import mcp
+
+        assert hasattr(mcp, "AnchorMCPServer")
+        assert mcp.AnchorMCPServer is AnchorMCPServer
