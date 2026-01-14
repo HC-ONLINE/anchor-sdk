@@ -620,7 +620,6 @@ class TestMCPIntegration:
 
         assert wrapper.agent_id == agent_id
         # Should not have called validation
-        anchor.agents.get.reset_mock()
         anchor.agents.get.assert_not_called()
 
     def test_anchor_mcp_server_validation_missing_agents_api(self, agent_id):
