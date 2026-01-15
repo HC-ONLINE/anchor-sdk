@@ -150,7 +150,7 @@ class DataNamespace(BaseNamespace):
         """
         response = self._http.post(
             f"/agents/{agent_id}/data/batch",
-            data={"items": [{"key": k, "value": v} for k, v in items.items()]},
+            data={"entries": [{"key": k, "value": v} for k, v in items.items()]},
         )
         return [WriteResult.from_dict(r) for r in response.get("results", [])]
 
@@ -239,7 +239,9 @@ class DataNamespace(BaseNamespace):
         if prefix:
             params["prefix"] = prefix
         response = self._http.get(f"/agents/{agent_id}/data", params=params)
-        return [k.get("key", "") for k in response.get("keys", [])]
+        # Support both new format (data) and old format (keys) for backward compatibility
+        items = response.get("data") or response.get("keys", [])
+        return [k.get("key", "") for k in items]
 
     def search(
         self,

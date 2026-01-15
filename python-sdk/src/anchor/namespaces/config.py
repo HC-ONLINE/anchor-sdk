@@ -115,7 +115,9 @@ class ConfigNamespace(BaseNamespace):
         response = self._http.get(
             f"/agents/{agent_id}/config/versions", params={"limit": limit}
         )
-        return [ConfigVersion.from_dict(v) for v in response.get("versions", [])]
+        # Support both new format (data) and old format (versions) for backward compatibility
+        versions_data = response.get("data") or response.get("versions", [])
+        return [ConfigVersion.from_dict(v) for v in versions_data]
 
     def get_version(self, agent_id: str, version: str) -> Config:
         """

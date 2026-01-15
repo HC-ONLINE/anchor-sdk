@@ -169,7 +169,9 @@ class AuditNamespace(BaseNamespace):
             params["end"] = end_time.isoformat()
 
         response = self._http.get(f"/agents/{agent_id}/audit", params=params)
-        return [AuditEvent.from_dict(e) for e in response.get("events", [])]
+        # Support both new format (data) and old format (events) for backward compatibility
+        events_data = response.get("data") or response.get("events", [])
+        return [AuditEvent.from_dict(e) for e in events_data]
 
     def get(self, agent_id: str, audit_id: str) -> AuditEvent:
         """
