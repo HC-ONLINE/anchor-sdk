@@ -82,6 +82,7 @@ class Anchor:
     def __init__(
         self,
         api_key: Optional[str] = None,
+        workspace_id: Optional[str] = None,
         base_url: Optional[str] = None,
         config: Optional[ClientConfig] = None,
         **kwargs,
@@ -90,7 +91,7 @@ class Anchor:
         Initialize Anchor client.
 
         Args:
-            api_key: API key
+            api_key: API key (required)
             base_url: API base URL (default: https://api.getanchor.dev)
             config: Full configuration object
             **kwargs: Additional configuration options passed to Config
@@ -103,6 +104,7 @@ class Anchor:
 
             self._config = ClientConfig(
                 api_key=api_key,
+                workspace_id=workspace_id,
                 base_url=base_url or "https://api.getanchor.dev",
                 **kwargs,
             )
@@ -146,6 +148,27 @@ class Anchor:
     def client_config(self) -> ClientConfig:
         """Current client configuration."""
         return self._config
+
+    def get_workspace_id(self) -> Optional[str]:
+        """
+        @deprecated Workspace functionality is not exposed. This method is kept for backward compatibility only.
+        @internal
+        """
+        if self._config.workspace_id:
+            return self._config.workspace_id
+        
+        try:
+            # Try to fetch workspaces (endpoint may not exist)
+            response = self._http.get("/workspaces")
+            workspaces = response.get("workspaces", response.get("data", []))
+            if isinstance(workspaces, list) and len(workspaces) > 0:
+                workspace = workspaces[0]
+                return workspace.get("id") or workspace.get("workspaceId")
+        except Exception:
+            # If endpoint doesn't exist or fails, return None
+            pass
+        
+        return None
 
     def __repr__(self) -> str:
         return f"Anchor(base_url='{self._config.base_url}')"
