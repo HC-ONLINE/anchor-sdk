@@ -10,9 +10,24 @@ pip install anchorai
 
 ## Quick Start
 
+### 1. Get Your API Key
+
+Sign up at [getanchor.dev](https://getanchor.dev) to get your **API Key**.
+
+**Important:** Copy your API key when you sign up - you won't be able to see it again!
+
+### 2. Install the SDK
+
+```bash
+pip install anchorai
+```
+
+### 3. Initialize and Use
+
 ```python
 from anchor import Anchor
 
+# Initialize with your API key
 anchor = Anchor(api_key="your-api-key")
 
 # Create an agent
@@ -266,18 +281,19 @@ except RateLimitError as e:
 ## Client Configuration
 
 ```python
-from anchor import Anchor
+from anchor import Anchor, ClientConfig
 
-# Simple
+# Simple (just API key)
 anchor = Anchor(api_key="your-api-key")
 
 # Full configuration
-anchor = Anchor(
+config = ClientConfig(
     api_key="your-api-key",
     base_url="https://api.getanchor.dev",
     timeout=30.0,
     retry_attempts=3
 )
+anchor = Anchor(config=config)
 ```
 
 ## Requirements
