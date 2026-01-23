@@ -163,19 +163,20 @@ class HttpClient:
         raise NetworkError("Request failed after retries")
 
     def get(
-        self, endpoint: str, params: Optional[Dict[str, Any]] = None
+        self, endpoint: str, params: Optional[Dict[str, Any]] = None, workspace_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """Make GET request"""
-        return self.request("GET", endpoint, params=params)
+        return self.request("GET", endpoint, params=params, workspace_id=workspace_id)
 
     def post(
         self,
         endpoint: str,
         data: Optional[Dict[str, Any]] = None,
         params: Optional[Dict[str, Any]] = None,
+        workspace_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Make POST request"""
-        return self.request("POST", endpoint, data=data, params=params)
+        return self.request("POST", endpoint, data=data, params=params, workspace_id=workspace_id)
 
     def put(
         self,

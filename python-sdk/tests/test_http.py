@@ -59,7 +59,7 @@ class TestHttpClient:
         assert http_client.config == config
         assert http_client.session is not None
         assert http_client.session.headers["X-API-Key"] == "anc_test_key"
-        assert http_client.session.headers["User-Agent"] == "anchorai-python/1.0.2"
+        assert http_client.session.headers["User-Agent"] == "anchorai-python/1.1.0"
 
     def test_request_success(self, http_client):
         """Test successful HTTP request."""
@@ -70,7 +70,7 @@ class TestHttpClient:
         mock_response.json.return_value = {"result": "success"}
 
         with patch.object(http_client.session, "request", return_value=mock_response):
-            result = http_client.request("GET", "/v1/test")
+            result = http_client.request("GET", "/test")
             assert result == {"result": "success"}
 
     def test_request_empty_response(self, http_client):
@@ -81,7 +81,7 @@ class TestHttpClient:
         mock_response.content = b""
 
         with patch.object(http_client.session, "request", return_value=mock_response):
-            result = http_client.request("GET", "/v1/test")
+            result = http_client.request("GET", "/test")
             assert result == {}
 
     def test_request_with_data(self, http_client):
@@ -93,7 +93,7 @@ class TestHttpClient:
         mock_response.json.return_value = {"id": "123"}
 
         with patch.object(http_client.session, "request", return_value=mock_response):
-            result = http_client.request("POST", "/v1/test", data={"name": "test"})
+            result = http_client.request("POST", "/test", data={"name": "test"})
             assert result == {"id": "123"}
             # Verify JSON was sent
             http_client.session.request.assert_called_once()
@@ -109,7 +109,7 @@ class TestHttpClient:
         mock_response.json.return_value = {"items": []}
 
         with patch.object(http_client.session, "request", return_value=mock_response):
-            result = http_client.request("GET", "/v1/test", params={"limit": 10})
+            result = http_client.request("GET", "/test", params={"limit": 10})
             assert result == {"items": []}
             # Verify params were sent
             http_client.session.request.assert_called_once()
@@ -239,7 +239,7 @@ class TestHttpClient:
             "request",
             side_effect=[mock_response_fail, mock_response_success],
         ), patch("time.sleep"):  # Don't actually sleep in tests
-            result = http_client.request("GET", "/v1/test")
+            result = http_client.request("GET", "/test")
             assert result == {"result": "success"}
             assert http_client.session.request.call_count == 2
 
@@ -256,7 +256,7 @@ class TestHttpClient:
             "request",
             side_effect=[Timeout("Request timeout"), mock_response],
         ), patch("time.sleep"):  # Don't actually sleep in tests
-            result = http_client.request("GET", "/v1/test")
+            result = http_client.request("GET", "/test")
             assert result == {"result": "success"}
             assert http_client.session.request.call_count == 2
 
@@ -273,7 +273,7 @@ class TestHttpClient:
             "request",
             side_effect=[ConnectionError("Connection failed"), mock_response],
         ), patch("time.sleep"):  # Don't actually sleep in tests
-            result = http_client.request("GET", "/v1/test")
+            result = http_client.request("GET", "/test")
             assert result == {"result": "success"}
             assert http_client.session.request.call_count == 2
 
@@ -313,7 +313,7 @@ class TestHttpClient:
             "request",
             side_effect=[mock_response_fail, mock_response_success],
         ), patch("time.sleep"):  # Don't actually sleep in tests
-            result = http_client.request("GET", "/v1/test")
+            result = http_client.request("GET", "/test")
             assert result == {"result": "success"}
             assert http_client.session.request.call_count == 2
 
@@ -357,7 +357,7 @@ class TestHttpClient:
         mock_response.json.return_value = {"result": "success"}
 
         with patch.object(http_client.session, "request", return_value=mock_response):
-            result = http_client.get("/v1/test", params={"limit": 10})
+            result = http_client.get("/test", params={"limit": 10})
             assert result == {"result": "success"}
             http_client.session.request.assert_called_once_with(
                 "GET",
@@ -377,7 +377,7 @@ class TestHttpClient:
         mock_response.json.return_value = {"id": "123"}
 
         with patch.object(http_client.session, "request", return_value=mock_response):
-            result = http_client.post("/v1/test", data={"name": "test"})
+            result = http_client.post("/test", data={"name": "test"})
             assert result == {"id": "123"}
             http_client.session.request.assert_called_once_with(
                 "POST",
@@ -397,7 +397,7 @@ class TestHttpClient:
         mock_response.json.return_value = {"updated": True}
 
         with patch.object(http_client.session, "request", return_value=mock_response):
-            result = http_client.put("/v1/test", data={"name": "updated"})
+            result = http_client.put("/test", data={"name": "updated"})
             assert result == {"updated": True}
 
     def test_patch_method(self, http_client):
@@ -409,7 +409,7 @@ class TestHttpClient:
         mock_response.json.return_value = {"patched": True}
 
         with patch.object(http_client.session, "request", return_value=mock_response):
-            result = http_client.patch("/v1/test", data={"name": "patched"})
+            result = http_client.patch("/test", data={"name": "patched"})
             assert result == {"patched": True}
 
     def test_delete_method(self, http_client):
@@ -421,7 +421,7 @@ class TestHttpClient:
         mock_response.json.return_value = {"deleted": True}
 
         with patch.object(http_client.session, "request", return_value=mock_response):
-            result = http_client.delete("/v1/test")
+            result = http_client.delete("/test")
             assert result == {"deleted": True}
 
 
@@ -456,7 +456,7 @@ class TestHttpClientWorkspaceId:
         return HttpClient(config_without_workspace)
 
     def test_post_includes_workspace_id_in_body(self, http_client_with_workspace):
-        """Test that POST requests include workspaceId in body."""
+        """Test that POST requests work correctly (workspaceId handled by API)."""
         mock_response = Mock()
         mock_response.ok = True
         mock_response.status_code = 200
@@ -464,15 +464,15 @@ class TestHttpClientWorkspaceId:
         mock_response.json.return_value = {"id": "123"}
 
         with patch.object(http_client_with_workspace.session, "request", return_value=mock_response):
-            http_client_with_workspace.post("/v1/test", data={"name": "test"})
+            http_client_with_workspace.post("/test", data={"name": "test"})
             call_args = http_client_with_workspace.session.request.call_args
             assert call_args[0][0] == "POST"
-            assert "workspaceId" in call_args[1]["json"]
-            assert call_args[1]["json"]["workspaceId"] == "workspace-123"
+            # workspaceId is handled automatically by API, not injected by SDK
             assert call_args[1]["json"]["name"] == "test"
+            assert call_args[0][1] == "https://api.getanchor.dev/v1/test"
 
     def test_get_includes_workspace_id_in_params(self, http_client_with_workspace):
-        """Test that GET requests include workspaceId in query params."""
+        """Test that GET requests work correctly (workspaceId handled by API)."""
         mock_response = Mock()
         mock_response.ok = True
         mock_response.status_code = 200
@@ -480,15 +480,15 @@ class TestHttpClientWorkspaceId:
         mock_response.json.return_value = {"result": "success"}
 
         with patch.object(http_client_with_workspace.session, "request", return_value=mock_response):
-            http_client_with_workspace.get("/v1/test", params={"limit": 10})
+            http_client_with_workspace.get("/test", params={"limit": 10})
             call_args = http_client_with_workspace.session.request.call_args
             assert call_args[0][0] == "GET"
-            assert "workspaceId" in call_args[1]["params"]
-            assert call_args[1]["params"]["workspaceId"] == "workspace-123"
+            # workspaceId is handled automatically by API, not injected by SDK
             assert call_args[1]["params"]["limit"] == 10
+            assert call_args[0][1] == "https://api.getanchor.dev/v1/test"
 
     def test_put_includes_workspace_id_in_body(self, http_client_with_workspace):
-        """Test that PUT requests include workspaceId in body."""
+        """Test that PUT requests work correctly (workspaceId handled by API)."""
         mock_response = Mock()
         mock_response.ok = True
         mock_response.status_code = 200
@@ -496,13 +496,14 @@ class TestHttpClientWorkspaceId:
         mock_response.json.return_value = {"updated": True}
 
         with patch.object(http_client_with_workspace.session, "request", return_value=mock_response):
-            http_client_with_workspace.put("/v1/test", data={"name": "updated"})
+            http_client_with_workspace.put("/test", data={"name": "updated"})
             call_args = http_client_with_workspace.session.request.call_args
-            assert "workspaceId" in call_args[1]["json"]
-            assert call_args[1]["json"]["workspaceId"] == "workspace-123"
+            # workspaceId is handled automatically by API, not injected by SDK
+            assert call_args[1]["json"]["name"] == "updated"
+            assert call_args[0][1] == "https://api.getanchor.dev/v1/test"
 
     def test_delete_includes_workspace_id_in_params(self, http_client_with_workspace):
-        """Test that DELETE requests include workspaceId in query params."""
+        """Test that DELETE requests work correctly (workspaceId handled by API)."""
         mock_response = Mock()
         mock_response.ok = True
         mock_response.status_code = 200
@@ -510,13 +511,17 @@ class TestHttpClientWorkspaceId:
         mock_response.json.return_value = {"deleted": True}
 
         with patch.object(http_client_with_workspace.session, "request", return_value=mock_response):
-            http_client_with_workspace.delete("/v1/test")
+            http_client_with_workspace.delete("/test")
             call_args = http_client_with_workspace.session.request.call_args
-            assert "workspaceId" in call_args[1]["params"]
-            assert call_args[1]["params"]["workspaceId"] == "workspace-123"
+            # workspaceId is handled automatically by API, not injected by SDK
+            assert call_args[0][1] == "https://api.getanchor.dev/v1/test"
+            # params may be None for DELETE
+            if call_args[1].get("params"):
+                # If params exist, workspaceId should not be injected
+                assert "workspaceId" not in call_args[1].get("params", {})
 
     def test_per_request_workspace_id_override(self, http_client_with_workspace):
-        """Test that per-request workspace_id overrides config default."""
+        """Test that workspace_id parameter is accepted but ignored (handled by API)."""
         mock_response = Mock()
         mock_response.ok = True
         mock_response.status_code = 200
@@ -524,13 +529,16 @@ class TestHttpClientWorkspaceId:
         mock_response.json.return_value = {"id": "123"}
 
         with patch.object(http_client_with_workspace.session, "request", return_value=mock_response):
-            # Override workspace_id for this request
-            http_client_with_workspace.post("/v1/test", data={"name": "test"}, workspace_id="workspace-999")
+            # workspace_id parameter is kept for backward compatibility but ignored
+            # post() now accepts workspace_id parameter for consistency
+            http_client_with_workspace.post("/test", data={"name": "test"}, workspace_id="workspace-999")
             call_args = http_client_with_workspace.session.request.call_args
-            assert call_args[1]["json"]["workspaceId"] == "workspace-999"  # Should use override, not config default
+            # workspaceId is handled automatically by API, not injected by SDK
+            assert call_args[1]["json"]["name"] == "test"
+            assert call_args[0][1] == "https://api.getanchor.dev/v1/test"
 
     def test_workspace_id_not_added_if_already_present(self, http_client_with_workspace):
-        """Test that workspaceId is not duplicated if already in request."""
+        """Test that workspaceId in request data is passed through unchanged."""
         mock_response = Mock()
         mock_response.ok = True
         mock_response.status_code = 200
@@ -538,14 +546,15 @@ class TestHttpClientWorkspaceId:
         mock_response.json.return_value = {"id": "123"}
 
         with patch.object(http_client_with_workspace.session, "request", return_value=mock_response):
-            # Request already has workspaceId
-            http_client_with_workspace.post("/v1/test", data={"name": "test", "workspaceId": "workspace-999"})
+            # Request already has workspaceId in data
+            http_client_with_workspace.post("/test", data={"name": "test", "workspaceId": "workspace-999"})
             call_args = http_client_with_workspace.session.request.call_args
-            # Should keep the one from request, not add config default
+            # Should pass through unchanged (SDK doesn't inject, API handles it)
             assert call_args[1]["json"]["workspaceId"] == "workspace-999"
+            assert call_args[1]["json"]["name"] == "test"
 
     def test_warning_when_workspace_id_missing(self, http_client_without_workspace):
-        """Test that warning is shown when workspace_id is not provided."""
+        """Test that no warning is shown (workspace_id is optional and handled by API)."""
         import warnings
         mock_response = Mock()
         mock_response.ok = True
@@ -556,8 +565,7 @@ class TestHttpClientWorkspaceId:
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             with patch.object(http_client_without_workspace.session, "request", return_value=mock_response):
-                http_client_without_workspace.get("/v1/test")
-                # Should have warning about missing workspace_id
-                assert len(w) > 0
-                assert any("workspace_id" in str(warning.message).lower() for warning in w)
+                http_client_without_workspace.get("/test")
+                # No warning in v1.1.0 - workspace_id is optional and handled by API
+                assert len(w) == 0
 
