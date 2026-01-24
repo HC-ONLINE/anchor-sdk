@@ -1,10 +1,7 @@
 /**
- * Anonymous telemetry for Anchor SDK.
- *
- * Opt-out tracking of SDK usage to help improve the product.
- *
- * Disable via environment variable: ANCHOR_TELEMETRY=0
- * @module
+ * Anonymous telemetry for Anchor SDK
+ * 
+ * Tracks SDK usage to help improve the product. Completely opt-out, transparent, and privacy-respecting.
  */
 
 const TELEMETRY_ENDPOINT = process.env.ANCHOR_TELEMETRY_ENDPOINT || 
@@ -20,14 +17,11 @@ interface TelemetryProperties {
   [key: string]: any;
 }
 
-/**
- * Anonymous telemetry tracker for SDK usage.
- */
 export class Telemetry {
   private baseUrl: string;
   private apiKey?: string;
   private enabled: boolean;
-  private sdkVersion = '1.0.0';
+  private sdkVersion = '1.1.0';
   private language = 'typescript';
   private languageVersion = process.version;
   private platform: string;
@@ -60,9 +54,6 @@ export class Telemetry {
     }
   }
 
-  /**
-   * Track an event asynchronously (non-blocking).
-   */
   private async trackAsync(event: string, properties?: TelemetryProperties): Promise<void> {
     if (!this.enabled) {
       return;
@@ -105,9 +96,6 @@ export class Telemetry {
     }
   }
 
-  /**
-   * Track a method call.
-   */
   trackMethodCall(methodName: string, success: boolean = true, errorType?: string): void {
     if (!this.enabled) {
       return;
@@ -126,9 +114,6 @@ export class Telemetry {
     this.trackAsync('sdk.method_called', properties).catch(() => {});
   }
 
-  /**
-   * Track an error.
-   */
   trackError(errorType: string, methodName?: string): void {
     if (!this.enabled) {
       return;
@@ -166,9 +151,6 @@ const getFetch = (): typeof fetch => {
 // Global telemetry instances (created per client)
 const telemetryInstances: Map<string, Telemetry> = new Map();
 
-/**
- * Get or create telemetry instance for a client.
- */
 export function getTelemetry(baseUrl: string, apiKey?: string): Telemetry {
   const key = `${baseUrl}:${apiKey || 'no-key'}`;
   if (!telemetryInstances.has(key)) {

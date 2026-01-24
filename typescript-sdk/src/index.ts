@@ -86,6 +86,5 @@ export type {
 
 // Integrations (optional - users can import directly from 'anchorai/integrations')
 export * from './integrations';
-export * from './policies';
 
-export const VERSION = '1.0.0';
+export const VERSION = '1.1.0';

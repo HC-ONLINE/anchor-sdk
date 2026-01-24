@@ -1,7 +1,7 @@
 {
   "name": "anchorai",
-  "version": "1.0.0",
-  "description": "Control what your AI agents store. Audit everything.",
+  "version": "1.1.0",
+  "description": "Policy-enforced storage for AI agents. Block bad data. Prove what happened.",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
     "dist/**/*.d.ts",
     "!dist/__tests__",
     "README.md",
-    "LICENSE"
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsc",
@@ -22,7 +22,6 @@
   "keywords": [
     "ai",
     "agents",
-    "ai-agents",
     "storage",
     "policy",
     "audit",
@@ -31,20 +30,19 @@
     "langchain",
     "crewai",
     "openai",
-    "sdk",
-    "agent-memory",
-    "state",
-    "checkpoints"
+    "anthropic",
+    "pii",
+    "compliance"
   ],
-  "author": "Tasha Kim <founders@getanchor.dev>",
+  "author": "Anchor <founders@getanchor.dev>",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anchorco/anchor-sdk.git",
+    "url": "git+https://github.com/useanchor/anchor-sdk.git",
     "directory": "typescript-sdk"
   },
   "bugs": {
-    "url": "https://github.com/anchorco/anchor-sdk/issues"
+    "url": "https://github.com/useanchor/anchor-sdk/issues"
   },
   "homepage": "https://getanchor.dev",
   "dependencies": {},
@@ -65,4 +63,3 @@
     "node": ">=18.0.0"
   }
 }
-
