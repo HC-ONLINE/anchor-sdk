@@ -147,4 +147,27 @@ export class Anchor {
   get clientConfig(): Config {
     return this._config;
   }
+
+  /**
+   * @deprecated Workspace functionality is not exposed. This method is kept for backward compatibility only.
+   * @internal
+   */
+  async getWorkspaceId(): Promise<string | undefined> {
+    if (this._config.workspaceId) {
+      return this._config.workspaceId;
+    }
+
+    try {
+      const response = await this._http.get<{ workspaces?: Array<{ id?: string; workspaceId?: string }> }>('/workspaces');
+      const workspaces = response.workspaces || (Array.isArray(response) ? response : []);
+      if (workspaces.length > 0) {
+        return workspaces[0].id || workspaces[0].workspaceId;
+      }
+    } catch (error) {
+      // If endpoint doesn't exist or fails, return undefined
+      console.warn('Could not fetch workspace ID:', error);
+    }
+
+    return undefined;
+  }
 }
