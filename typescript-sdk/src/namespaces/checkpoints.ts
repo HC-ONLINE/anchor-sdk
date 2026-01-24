@@ -133,11 +133,13 @@ export class CheckpointsNamespace {
    * @returns List of Checkpoint objects
    */
   async list(agentId: string, limit = 20): Promise<Checkpoint[]> {
-    const response = await this.http.get<{ checkpoints: Record<string, any>[] }>(
+    const response = await this.http.get<{ data: Record<string, any>[]; checkpoints?: Record<string, any>[] }>(
       `/agents/${agentId}/checkpoints`,
       { limit }
     );
-    return (response.checkpoints || []).map(parseCheckpoint);
+    // Support both new format (data) and old format (checkpoints) for backward compatibility
+    const items = response.data || response.checkpoints || [];
+    return items.map(parseCheckpoint);
   }
 
   /**

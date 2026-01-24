@@ -118,11 +118,13 @@ export class ConfigNamespace {
    * @returns List of ConfigVersion objects
    */
   async versions(agentId: string, limit = 20): Promise<ConfigVersion[]> {
-    const response = await this.http.get<{ versions: Record<string, any>[] }>(
+    const response = await this.http.get<{ data: Record<string, any>[]; versions?: Record<string, any>[] }>(
       `/agents/${agentId}/config/versions`,
       { limit }
     );
-    return (response.versions || []).map(parseConfigVersion);
+    // Support both new format (data) and old format (versions) for backward compatibility
+    const items = response.data || response.versions || [];
+    return items.map(parseConfigVersion);
   }
 
   /**
