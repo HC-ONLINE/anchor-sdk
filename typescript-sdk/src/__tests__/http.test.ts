@@ -64,7 +64,7 @@ describe('HttpClient', () => {
           method: 'GET',
           headers: expect.objectContaining({
             'X-API-Key': 'anc_test_key',
-            'User-Agent': 'anchorai-typescript/1.0.0',
+            'User-Agent': 'anchorai-typescript/1.1.0',
           }),
         })
       );
@@ -528,7 +528,7 @@ describe('HttpClient', () => {
         expect.any(String),
         expect.objectContaining({
           headers: expect.objectContaining({
-            'User-Agent': 'anchorai-typescript/1.0.0',
+            'User-Agent': 'anchorai-typescript/1.1.0',
           }),
         })
       );
@@ -591,6 +591,135 @@ describe('HttpClient', () => {
       const result = await httpClient.get('/v1/test');
 
       expect(result).toEqual({ error: 'plain text response' });
+    });
+  });
+
+  describe('WorkspaceId Support', () => {
+    let httpClientWithWorkspace: HttpClient;
+    let httpClientWithoutWorkspace: HttpClient;
+
+    beforeEach(() => {
+      const configWithWorkspace: Config = {
+        apiKey: 'anc_test_key',
+        workspaceId: 'workspace-123',
+        baseUrl: 'https://api.getanchor.dev',
+      };
+      httpClientWithWorkspace = new HttpClient(configWithWorkspace);
+
+      const configWithoutWorkspace: Config = {
+        apiKey: 'anc_test_key',
+        baseUrl: 'https://api.getanchor.dev',
+      };
+      httpClientWithoutWorkspace = new HttpClient(configWithoutWorkspace);
+    });
+
+    it('should NOT inject workspaceId in POST request body (API handles it automatically)', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ success: true }),
+      } as Response);
+
+      await httpClientWithWorkspace.post('/agents', { name: 'test-agent' });
+
+      const callArgs = mockFetch.mock.calls[0];
+      const body = JSON.parse(callArgs[1]?.body as string);
+      // workspaceId is NOT injected - API handles it automatically from API key
+      expect(body.workspaceId).toBeUndefined();
+      expect(body.name).toBe('test-agent');
+    });
+
+    it('should NOT inject workspaceId in GET request params (API handles it automatically)', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ agents: [] }),
+      } as Response);
+
+      await httpClientWithWorkspace.get('/agents');
+
+      const callArgs = mockFetch.mock.calls[0];
+      const url = new URL(callArgs[0] as string);
+      // workspaceId is NOT in query params - API handles it automatically from API key
+      expect(url.searchParams.get('workspaceId')).toBeNull();
+    });
+
+    it('should NOT inject workspaceId in PUT request body (API handles it automatically)', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ updated: true }),
+      } as Response);
+
+      await httpClientWithWorkspace.put('/agents/123', { name: 'updated' });
+
+      const callArgs = mockFetch.mock.calls[0];
+      const body = JSON.parse(callArgs[1]?.body as string);
+      // workspaceId is NOT injected - API handles it automatically from API key
+      expect(body.workspaceId).toBeUndefined();
+      expect(body.name).toBe('updated');
+    });
+
+    it('should NOT inject workspaceId in DELETE request params (API handles it automatically)', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ deleted: true }),
+      } as Response);
+
+      await httpClientWithWorkspace.delete('/agents/123');
+
+      const callArgs = mockFetch.mock.calls[0];
+      const url = new URL(callArgs[0] as string);
+      // workspaceId is NOT in query params - API handles it automatically from API key
+      expect(url.searchParams.get('workspaceId')).toBeNull();
+    });
+
+    it('should NOT inject workspaceId even if provided (API handles it automatically)', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ success: true }),
+      } as Response);
+
+      // workspaceId parameter is ignored - API uses default from API key
+      await httpClientWithWorkspace.post('/agents', { name: 'test' }, undefined, 'workspace-override');
+
+      const callArgs = mockFetch.mock.calls[0];
+      const body = JSON.parse(callArgs[1]?.body as string);
+      // workspaceId is NOT injected - API handles it automatically from API key
+      expect(body.workspaceId).toBeUndefined();
+    });
+
+    it('should preserve workspaceId if explicitly provided in data (for backward compatibility)', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ success: true }),
+      } as Response);
+
+      // If user explicitly includes workspaceId in data, it's preserved (though API will ignore it)
+      await httpClientWithWorkspace.post('/agents', { name: 'test', workspaceId: 'workspace-999' });
+
+      const callArgs = mockFetch.mock.calls[0];
+      const body = JSON.parse(callArgs[1]?.body as string);
+      // workspaceId is preserved in request body (though API will use default from API key)
+      expect(body.workspaceId).toBe('workspace-999');
+    });
+
+    it('should work without workspaceId (API handles it automatically)', async () => {
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ success: true }),
+      } as Response);
+
+      await httpClientWithoutWorkspace.post('/agents', { name: 'test' });
+
+      // No warning should be shown - workspaceId is optional in v1.1.0
+      expect(consoleSpy).not.toHaveBeenCalled();
+      consoleSpy.mockRestore();
     });
   });
 });
