@@ -1,13 +1,16 @@
 # Anchor SDK
 
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/anchorco/anchor-sdk)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
-![Build Status](https://img.shields.io/github/actions/workflow/status/anchorco/anchor-sdk/ci.yml?branch=main)
-![npm](https://img.shields.io/npm/v/anchorai)
-![pip](https://img.shields.io/pypi/v/anchorai)
 
 **Control what your AI agents store. Audit everything.**
 
-_Block_ bad data before storage. _Prove_ what happened. _Rollback_ when things break.
+_Block_ bad data before storage.
+
+_Prove_ what happened.
+
+_Rollback_ when things break.
+
 
 ## Installation
 
@@ -17,27 +20,37 @@ _Block_ bad data before storage. _Prove_ what happened. _Rollback_ when things b
 
 ## Quick Start
 
-### 1. Get an API Key
+### 1. Sign Up and Get Credentials
 
-Sign up at [getanchor.dev](https://getanchor.dev) to get your API key and workspace ID.
+1. **Go to [app.getanchor.dev](https://app.getanchor.dev)**
+2. **Sign up** with your email (or log in if you already have an account)
+3. **Copy your API Key** (e.g., `anc_abc123...`)
+4. **Important:** Save this securely - you won't be able to see the API key again!
 
-### 2. Start Using Anchor
+### 2. Install the SDK
 
-**Python** ([PyPI](https://pypi.org/project/anchorai), [code](https://github.com/anchorco/anchor-sdk/tree/main/python-sdk)):
+**Python** ([PyPI](https://pypi.org/project/anchorai/1.1.0/), [code](https://github.com/anchorco/anchor-sdk/python-sdk)):
 ```python
 from anchor import Anchor
 
+# Initialize with your API key
 anchor = Anchor(api_key="your-api-key")
 
+# Create an agent
 agent = anchor.agents.create("support-bot")
+
+# Configure policies
 anchor.config.update(agent.id, {"policies": {"block_pii": True}})
 ```
 
-**TypeScript** ([NPM](https://www.npmjs.com/package/anchorai), [code](https://github.com/anchorco/anchor-sdk/tree/main/typescript-sdk)):
+**TypeScript** ([npm](https://www.npmjs.com/package/anchorai/1.1.0), [code](https://github.com/anchorco/anchor-sdk)):
 ```typescript
 import { Anchor } from 'anchorai';
 
-const anchor = new Anchor({ apiKey: 'your-api-key' });
+// Initialize with your API key
+const anchor = new Anchor({ 
+  apiKey: 'your-api-key'
+});
 
 const agent = await anchor.agents.create('support-bot');
 await anchor.config.update(agent.id, { policies: { block_pii: true } });
@@ -51,9 +64,11 @@ await anchor.config.update(agent.id, { policies: { block_pii: true } });
 | `anchor.checkpoints` | Create state snapshots and restore |create, list, get, restore, delete|
 | `anchor.audit` | Keep hash-chained audit trail |query, get, verify, export|
 
-## Docs
+## Documentation
 
-https://docs.getanchor.dev/
+[**Python Reference**](https://github.com/anchorco/anchor-sdk/tree/release/v1.1.0/python-sdk)
+  
+**TypeScript Reference**: typescript-sdk/README.md
   
 **Contributing**: Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
@@ -61,24 +76,9 @@ https://docs.getanchor.dev/
 
 ## Links
 
-- **Website**: https://getanchor.dev
-- **GitHub Issues**: https://github.com/anchorco/anchor-sdk/issues
-- **Available** at (click):
-<p>
-  <a href="https://pypi.org/project/anchorai/">
-    <img
-      src="assets/pip_icon.png"
-      width="200"
-      alt="PyPI package"
-    />
-  </a>
-  <a href="https://www.npmjs.com/package/anchorai">
-    <img
-      src="assets/npm_icon.png"
-      width="200"
-      alt="NPM package"
-    />
-  </a>
-</p>
-
-- **Support**: founders@getanchor.dev
+- Website: https://getanchor.dev
+- Documentation: https://docs.getanchor.dev
+- Python SDK Docs: python-sdk/README.md
+- TypeScript SDK Docs: typescript-sdk/README.md
+- GitHub Issues: https://github.com/anchorco/anchor-sdk/issues
+- Support: founders@getanchor.dev
