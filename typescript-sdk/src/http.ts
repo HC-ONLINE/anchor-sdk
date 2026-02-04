@@ -71,17 +71,29 @@ export class HttpClient {
     method: string,
     endpoint: string,
     data?: Record<string, any>,
-    params?: Record<string, any>
+    params?: Record<string, any>,
+    workspaceId?: string
   ): Promise<T> {
     const baseUrl = this.config.baseUrl || 'https://api.getanchor.dev';
     const timeout = this.config.timeout || 30000;
     const retryAttempts = this.config.retryAttempts ?? 3;
     const retryDelay = this.config.retryDelay || 1000;
 
-    const url = new URL(`${baseUrl}${endpoint}`);
+    // WorkspaceId is handled automatically by the API based on the API key
+    // The API uses the default workspace from the API key - we don't need to inject it
+    // workspaceId parameter is kept for backward compatibility but is ignored
+    let requestData = data;
+    let requestParams = params;
 
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
+    // Add /v1 prefix to API endpoints (skip for auth/workspace endpoints and if already prefixed)
+    const apiPrefix = endpoint.startsWith('/auth') || endpoint.startsWith('/workspaces') || endpoint.startsWith('/api-keys') || endpoint.startsWith('/v1')
+      ? '' 
+      : '/v1';
+    const fullEndpoint = `${apiPrefix}${endpoint}`;
+    const url = new URL(`${baseUrl}${fullEndpoint}`);
+
+    if (requestParams) {
+      Object.entries(requestParams).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           url.searchParams.append(key, String(value));
         }
@@ -89,7 +101,7 @@ export class HttpClient {
     }
 
     const headers: Record<string, string> = {
-      'User-Agent': 'anchorai-typescript/1.0.0',
+      'User-Agent': 'anchorai-typescript/1.1.0',
     };
 
     if (this.config.apiKey) {
@@ -114,7 +126,7 @@ export class HttpClient {
           response = await fetchFn(url.toString(), {
             method,
             headers,
-            body: data ? JSON.stringify(data) : undefined,
+            body: requestData !== undefined ? JSON.stringify(requestData) : undefined,
             signal: controller.signal,
           });
         } catch (fetchError: any) {
@@ -194,23 +206,23 @@ export class HttpClient {
     throw new NetworkError('Request failed after retries');
   }
 
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
-    return this.request<T>('GET', endpoint, undefined, params);
+  async get<T>(endpoint: string, params?: Record<string, any>, workspaceId?: string): Promise<T> {
+    return this.request<T>('GET', endpoint, undefined, params, workspaceId);
   }
 
-  async post<T>(endpoint: string, data?: Record<string, any>, params?: Record<string, any>): Promise<T> {
-    return this.request<T>('POST', endpoint, data, params);
+  async post<T>(endpoint: string, data?: Record<string, any>, params?: Record<string, any>, workspaceId?: string): Promise<T> {
+    return this.request<T>('POST', endpoint, data, params, workspaceId);
   }
 
-  async put<T>(endpoint: string, data?: Record<string, any>, params?: Record<string, any>): Promise<T> {
-    return this.request<T>('PUT', endpoint, data, params);
+  async put<T>(endpoint: string, data?: Record<string, any>, params?: Record<string, any>, workspaceId?: string): Promise<T> {
+    return this.request<T>('PUT', endpoint, data, params, workspaceId);
   }
 
-  async patch<T>(endpoint: string, data?: Record<string, any>, params?: Record<string, any>): Promise<T> {
-    return this.request<T>('PATCH', endpoint, data, params);
+  async patch<T>(endpoint: string, data?: Record<string, any>, params?: Record<string, any>, workspaceId?: string): Promise<T> {
+    return this.request<T>('PATCH', endpoint, data, params, workspaceId);
   }
 
-  async delete<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
-    return this.request<T>('DELETE', endpoint, undefined, params);
+  async delete<T>(endpoint: string, params?: Record<string, any>, workspaceId?: string): Promise<T> {
+    return this.request<T>('DELETE', endpoint, undefined, params, workspaceId);
   }
 }

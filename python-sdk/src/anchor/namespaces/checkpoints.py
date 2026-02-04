@@ -112,7 +112,9 @@ class CheckpointsNamespace(BaseNamespace):
         response = self._http.get(
             f"/agents/{agent_id}/checkpoints", params={"limit": limit}
         )
-        return [Checkpoint.from_dict(c) for c in response.get("checkpoints", [])]
+        # Support both new format (data) and old format (checkpoints) for backward compatibility
+        checkpoints_data = response.get("data") or response.get("checkpoints", [])
+        return [Checkpoint.from_dict(c) for c in checkpoints_data]
 
     def get(self, agent_id: str, checkpoint_id: str) -> Checkpoint:
         """

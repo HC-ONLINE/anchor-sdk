@@ -74,11 +74,11 @@ export class AgentsNamespace {
    * @param metadata - Optional key-value metadata
    * @returns Created Agent object
    */
-  async create(name: string, metadata?: Record<string, any>): Promise<Agent> {
+  async create(name: string, metadata?: Record<string, any>, workspaceId?: string): Promise<Agent> {
     const response = await this.http.post<{ agent: Record<string, any> }>('/agents', {
       name,
       metadata: metadata || {},
-    });
+    }, undefined, workspaceId);
     return parseAgent(response.agent || response);
   }
 
@@ -114,8 +114,10 @@ export class AgentsNamespace {
     };
     if (options?.status) params.status = options.status;
 
-    const response = await this.http.get<{ agents: Record<string, any>[] }>('/agents', params);
-    return (response.agents || []).map(parseAgent);
+    const response = await this.http.get<{ data: Record<string, any>[]; agents?: Record<string, any>[] }>('/agents', params);
+    // Support both new format (data) and old format (agents) for backward compatibility
+    const items = response.data || response.agents || [];
+    return items.map(parseAgent);
   }
 
   /**

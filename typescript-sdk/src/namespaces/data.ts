@@ -141,7 +141,7 @@ export class DataNamespace {
    */
   async writeBatch(agentId: string, items: Record<string, string>): Promise<WriteResult[]> {
     const payload = {
-      items: Object.entries(items).map(([k, v]) => ({ key: k, value: v })),
+      entries: Object.entries(items).map(([k, v]) => ({ key: k, value: v })),
     };
     const response = await this.http.post<{ results: Record<string, any>[] }>(
       `/agents/${agentId}/data/batch`,
@@ -208,11 +208,13 @@ export class DataNamespace {
     const params: Record<string, any> = { limit: options?.limit || 100 };
     if (options?.prefix) params.prefix = options.prefix;
 
-    const response = await this.http.get<{ keys: { key: string }[] }>(
+    const response = await this.http.get<{ data: { key: string }[]; keys?: { key: string }[] }>(
       `/agents/${agentId}/data`,
       params
     );
-    return (response.keys || []).map((k) => k.key || '');
+    // Support both new format (data) and old format (keys) for backward compatibility
+    const items = response.data || response.keys || [];
+    return items.map((k: any) => k.key || '');
   }
 
   /**

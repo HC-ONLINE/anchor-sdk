@@ -70,6 +70,7 @@ class AgentsNamespace(BaseNamespace):
         self,
         name: str,
         metadata: Optional[Dict[str, Any]] = None,
+        workspace_id: Optional[str] = None,
     ) -> Agent:
         """
         Create a new agent.
@@ -87,6 +88,7 @@ class AgentsNamespace(BaseNamespace):
                 "name": name,
                 "metadata": metadata or {},
             },
+            workspace_id=workspace_id,
         )
         agent_data = response.get("agent", response)
         return Agent.from_dict(agent_data)
@@ -130,7 +132,8 @@ class AgentsNamespace(BaseNamespace):
             params["status"] = status
 
         response = self._http.get("/agents", params=params)
-        agents_data = response.get("agents", [])
+        # Support both new format (data) and old format (agents) for backward compatibility
+        agents_data = response.get("data") or response.get("agents", [])
         return [Agent.from_dict(a) for a in agents_data]
 
     def update(

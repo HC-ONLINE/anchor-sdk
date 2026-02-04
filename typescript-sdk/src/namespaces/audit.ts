@@ -166,11 +166,13 @@ export class AuditNamespace {
     if (options?.startTime) params.start = options.startTime.toISOString();
     if (options?.endTime) params.end = options.endTime.toISOString();
 
-    const response = await this.http.get<{ events: Record<string, any>[] }>(
+    const response = await this.http.get<{ data: Record<string, any>[]; events?: Record<string, any>[] }>(
       `/agents/${agentId}/audit`,
       params
     );
-    return (response.events || []).map(parseAuditEvent);
+    // Support both new format (data) and old format (events) for backward compatibility
+    const items = response.data || response.events || [];
+    return items.map(parseAuditEvent);
   }
 
   /**
