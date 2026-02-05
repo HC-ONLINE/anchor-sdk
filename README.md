@@ -1,7 +1,10 @@
 # Anchor SDK
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/anchorco/anchor-sdk)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
+![Build Status](https://img.shields.io/github/actions/workflow/status/anchorco/anchor-sdk/ci.yml?branch=main)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/anchorco/anchor-sdk)
+![npm](https://img.shields.io/npm/v/anchorai)
+![pip](https://img.shields.io/pypi/v/anchorai)
 
 **Control what your AI agents store. Audit everything.**
 
@@ -22,14 +25,15 @@ _Rollback_ when things break.
 
 ### 1. Sign Up and Get Credentials
 
-1. **Go to [app.getanchor.dev](https://app.getanchor.dev)**
+1. **Go to [app.getanchor.dev](https://getanchor.dev)**
 2. **Sign up** with your email (or log in if you already have an account)
 3. **Copy your API Key** (e.g., `anc_abc123...`)
-4. **Important:** Save this securely - you won't be able to see the API key again!
+
+**Important:** Save this securely - you won't be able to see the API key again!
 
 ### 2. Install the SDK
 
-**Python** ([PyPI](https://pypi.org/project/anchorai/1.1.0/), [code](https://github.com/anchorco/anchor-sdk/python-sdk)):
+**Python** ([PyPI](https://pypi.org/project/anchorai/1.1.0/), [Code](https://github.com/anchorco/anchor-sdk/python-sdk)):
 ```python
 from anchor import Anchor
 
@@ -43,7 +47,7 @@ agent = anchor.agents.create("support-bot")
 anchor.config.update(agent.id, {"policies": {"block_pii": True}})
 ```
 
-**TypeScript** ([npm](https://www.npmjs.com/package/anchorai/1.1.0), [code](https://github.com/anchorco/anchor-sdk)):
+**TypeScript** ([NPM](https://www.npmjs.com/package/anchorai/1.1.0), [Code](https://github.com/anchorco/anchor-sdk)):
 ```typescript
 import { Anchor } from 'anchorai';
 
