@@ -66,19 +66,18 @@ await anchor.config.update(agent.id, { policies: { block_pii: true } });
 
 ## Documentation
 
-[**Python Reference**](https://github.com/anchorco/anchor-sdk/tree/release/v1.1.0/python-sdk)
+[**API Documentation**](https://docs.getanchor.dev)
+
+[Python Reference](https://github.com/anchorco/anchor-sdk/tree/release/v1.1.0/python-sdk)
   
-**TypeScript Reference**: typescript-sdk/README.md
+[TypeScript Reference](typescript-sdk/README.md)
   
 **Contributing**: Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 **License**: This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Links
-
-- Website: https://getanchor.dev
-- Documentation: https://docs.getanchor.dev
-- Python SDK Docs: python-sdk/README.md
-- TypeScript SDK Docs: typescript-sdk/README.md
+- Website: **https://getanchor.dev**
+- Docs: **https://docs.getanchor.dev**
 - GitHub Issues: https://github.com/anchorco/anchor-sdk/issues
 - Support: founders@getanchor.dev
